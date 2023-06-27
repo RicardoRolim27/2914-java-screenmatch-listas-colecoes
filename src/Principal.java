@@ -70,7 +70,10 @@ public class Principal {
         
         System.out.println("Primeiro filme da lista = " + listaDeFilmes.get(0).getNome());
         
-        
+        for (int i = 0; i < listaDeFilmes.size(); i++) {
+			
+        	System.out.println(listaDeFilmes.get(i).getNome());
+		}
         
     }
 }
