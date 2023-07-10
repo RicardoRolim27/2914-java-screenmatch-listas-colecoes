@@ -1,8 +1,7 @@
 package br.com.alura.screenmatch.modelos;
 
-import com.google.gson.annotations.SerializedName;
-
 import br.com.alura.screenmatch.dto.TituloOmdbDTO;
+import br.com.alura.screenmatch.excecao.TituloNuloException;
 
 public class Titulo implements Comparable<Titulo> {
     private String nome;
@@ -20,6 +19,9 @@ public class Titulo implements Comparable<Titulo> {
 	}
 
 	public Titulo(TituloOmdbDTO tituloOmdbDto) {
+		if (tituloOmdbDto.getNome().isEmpty()) {
+			throw new TituloNuloException("Título não pode ser nulo.");
+		}
 		this.nome = tituloOmdbDto.getNome();
 		this.anoDeLancamento = Integer.valueOf(tituloOmdbDto.getAnoDeLancamento());
 		this.duracaoEmMinutos = Integer.valueOf(tituloOmdbDto.getDuracaoEmMinutos()
