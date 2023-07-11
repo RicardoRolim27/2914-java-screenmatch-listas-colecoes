@@ -7,7 +7,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.Scanner;
-
+import java.io.FileWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.util.*;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,35 +28,81 @@ public class PrincipalComBusca {
 
 		Scanner leitura = new Scanner(System.in);
 
-		String busca = leitura.next();
+		String busca = "";
+		
+		List<Titulo> titulos = new ArrayList(); 
 
-		String endereco = "https://www.omdbapi.com/?apikey=eadba239&t=";
-		try {
-			HttpClient client = HttpClient.newHttpClient();
-			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(endereco + busca.replace(" ", ""+""))).build();
+		while (!busca.equalsIgnoreCase("sair")) {
 
-			HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+			busca = leitura.next();
+			
+			if(busca.equalsIgnoreCase("sair")) {
+				break;
+			}
 
-			String json = response.body();
+			String endereco = "https://www.omdbapi.com/?apikey=eadba239&t=";
+			try {
+				HttpClient client = HttpClient.newHttpClient();
+				HttpRequest request = HttpRequest.newBuilder().uri(URI.create(endereco + busca.replace(" ", "" + "")))
+						.build();
 
-			Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+				HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
 
-			TituloOmdbDTO tituloOmdbDto;
-			// try {
-			tituloOmdbDto = gson.fromJson(json, TituloOmdbDTO.class);
-			System.out.println(tituloOmdbDto);
-			Titulo titulo = new Titulo(tituloOmdbDto);
-			System.out.println(titulo);
-		} catch (JsonSyntaxException e1) {
+				String json = response.body();
 
-			System.out.println("Ops, ocorreu um erro na busca do filme!n/" + "Não foi possível carregar");
-			System.out.println(e1.getMessage());
-		} catch (IllegalArgumentException e) {
-			System.out.println("Endereço inválido");
-			System.out.println(e.getMessage());
-		} catch (TituloNuloException e){
-			System.out.println(e.getMessage());
+				Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+
+				TituloOmdbDTO tituloOmdbDto;
+				// try {
+				tituloOmdbDto = gson.fromJson(json, TituloOmdbDTO.class);
+				System.out.println(tituloOmdbDto);
+				
+				Titulo titulo = new Titulo(tituloOmdbDto);
+				System.out.println(titulo);
+				
+				titulos.add(titulo);
+
+				FileWriter escrita = new FileWriter("C:\\Users\\ricardo.oliveira\\Documents\\filmes.txt");
+				escrita.write(titulo.toString());
+				escrita.close();
+
+				/*File file = new File("C:\\Users\\ricardo.oliveira\\Documents\\filmes.txt");
+
+				FileReader reader = new FileReader(file);
+
+				int data = reader.read();
+
+				while (data != -1) {
+					System.out.println((char) data);
+					data = reader.read();
+				}
+
+				reader.close();*/
+
+			} catch (JsonSyntaxException e1) {
+
+				System.out.println("Ops, ocorreu um erro na busca do filme!n/" + "Nï¿½o foi possï¿½vel carregar");
+				System.out.println(e1.getMessage());
+			} catch (IllegalArgumentException e) {
+				System.out.println("Endereï¿½o invï¿½lido");
+				System.out.println(e.getMessage());
+			} catch (TituloNuloException e) {
+				System.out.println(e.getMessage());
+			}
+
 		}
+		
+		System.out.println(titulos);
+		
+		FileWriter escrita = new FileWriter("filmes.json");
+		
+		Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
+				.setPrettyPrinting()
+				.create();
+		
+		escrita.write(gson.toJson(titulos));
+		
+		escrita.close();
 
 		System.out.println("Programa finalizou corretamente!");
 
